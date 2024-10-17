@@ -63,9 +63,4 @@ public class SecurityConfig {
     ) {
         return new WarehouseAuthenticationManager(userServiceImpl, passwordEncoder);
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }
