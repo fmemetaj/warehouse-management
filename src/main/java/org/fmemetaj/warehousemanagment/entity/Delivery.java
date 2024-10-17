@@ -23,13 +23,13 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Temporal(TemporalType.DATE)
-    @Column(nullable = false)
-    private Date deliveryDate;
-
     @OneToOne
     @JoinColumn(name = "order_id", nullable = false, unique = true)
     private Order order;
+
+    @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
+    private Date deliveryDate;
 
     @Enumerated(EnumType.STRING)
     private DeliveryStatus status = DeliveryStatus.SCHEDULED;

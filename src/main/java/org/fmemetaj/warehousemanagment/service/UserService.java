@@ -1,12 +1,17 @@
 package org.fmemetaj.warehousemanagment.service;
 
+import org.fmemetaj.warehousemanagment.controller.PasswordResetController;
 import org.fmemetaj.warehousemanagment.entity.RegistrationForm;
+import org.fmemetaj.warehousemanagment.entity.ResetPasswordResponse;
 import org.fmemetaj.warehousemanagment.entity.Result;
 import org.fmemetaj.warehousemanagment.entity.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
+
+    List<User> getAllUsers();
 
     Optional<User> findByUsername(String username);
 
@@ -14,9 +19,9 @@ public interface UserService {
 
     Result<User> updateUser(User user);
 
-    void deleteUser(String username);
+    boolean deleteUser(String username);
 
-    Result<User> findUserByUsername(String username);
+    ResetPasswordResponse requestNewPasswordByCurrentUser(User user, PasswordResetController.UpdatePasswordRequest updatedPasswordRequest);
 
-    void requestNewPassword(String username);
+    ResetPasswordResponse requestNewPassword(String username);
 }

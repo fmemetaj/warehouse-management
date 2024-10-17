@@ -61,7 +61,8 @@ public record Result<T>(T result, Result.Code code) {
         EXCEEDS_TRUCK_CAPACITY,
         INSUFFICIENT_INVENTORY,
         DELIVERY_NOT_FOUND,
-        ORDER_CANNOT_BE_COMPLETED;
+        ORDER_CANNOT_BE_COMPLETED,
+        USER_NOT_FOUND;
 
         public HttpStatus toHttpStatus() {
             return switch (this) {
@@ -72,7 +73,7 @@ public record Result<T>(T result, Result.Code code) {
                      INSUFFICIENT_INVENTORY, ORDER_CANNOT_BE_COMPLETED -> HttpStatus.CONFLICT;
                 case ORDER_ITEM_LIST_EMPTY, ORDER_NOT_FOUND, ORDER_ITEM_NOT_FOUND,
                      USER_ORDER_NOT_FOUND, INVENTORY_ITEM_NOT_FOUND, TRUCKS_NOT_FOUND,
-                     TRUCK_NOT_FOUND, DELIVERY_NOT_FOUND-> HttpStatus.NOT_FOUND;
+                     TRUCK_NOT_FOUND, DELIVERY_NOT_FOUND, USER_NOT_FOUND -> HttpStatus.NOT_FOUND;
                 default -> HttpStatus.INTERNAL_SERVER_ERROR;
             };
         }
