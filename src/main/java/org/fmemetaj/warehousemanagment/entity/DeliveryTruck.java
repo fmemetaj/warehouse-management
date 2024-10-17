@@ -7,27 +7,26 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
 @Entity
-@Table(name = "trucks")
-public class Truck {
+@Table(name = "delivery_trucks", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"delivery_id", "truck_id"})
+})
+public class DeliveryTruck {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String chassis;
+    @ManyToOne
+    @JoinColumn(name = "delivery_id", nullable = false)
+    private Delivery delivery;
 
-    @Column(unique = true)
-    private String licensePlate;
-
-    @OneToMany(mappedBy = "truck", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DeliveryTruck> deliveryTrucks;
+    @ManyToOne
+    @JoinColumn(name = "truck_id", nullable = false)
+    private Truck truck;
 }

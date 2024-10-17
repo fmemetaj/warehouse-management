@@ -35,6 +35,8 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    private String declineReason;
+
     @Temporal(TemporalType.DATE)
     private Date deadlineDate;
 

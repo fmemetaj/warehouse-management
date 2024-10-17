@@ -25,8 +25,15 @@ public class OrderServiceImpl implements OrderService {
         this.inventoryRepository = inventoryRepository;
     }
 
-    @Transactional
+    private static List<String> getOrderStatusEnumList() {
+        return Arrays.stream(Order.OrderStatus.values()).toList()
+                .stream()
+                .map(Enum::name)
+                .toList();
+    }
+
     @Override
+    @Transactional
     public Result<Order> createOrder(User user, List<OrderController.OrderItemRequest> requestOrderItems) {
 
         if (requestOrderItems == null || requestOrderItems.isEmpty()) {
@@ -54,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public Result<Order> updateOrder(User user, @NonNull Long orderId, Order updateOrderRequest) {
         var orderResult = getUserOrder(user, orderId);
         if (orderResult.isFailure()) {
@@ -83,6 +91,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public Result<Order> cancelOrder(User user, Long orderId) {
         var orderResult = getUserOrder(user, orderId);
         if (orderResult.isFailure()) {
@@ -103,6 +112,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public Result<Order> submitOrder(User user, Long orderId) {
         var orderResult = getUserOrder(user, orderId);
         if (orderResult.isFailure()) {
@@ -123,11 +133,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> viewOrdersByStatus(User user, String status) {
 
-        var orderStatusList = Arrays.stream(Order.OrderStatus.values()).toList()
-                .stream()
-                .map(Enum::name)
-                .toList();
-
+        var orderStatusList = getOrderStatusEnumList();
         if (!orderStatusList.contains(status)) {
             return Collections.emptyList();
         }
@@ -138,32 +144,67 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> viewAllOrders() {
+    public List<Order> viewAllOrders(String status) {
+
+        var orderStatusList = getOrderStatusEnumList();
+        if (!orderStatusList.contains(status)) {
+            return Collections.emptyList();
+        }
+
+        Order.OrderStatus orderStatus = Order.OrderStatus.valueOf(status);
+        return orderRepository.findAll().stream()
+                .filter(order -> order.getStatus() == orderStatus)
+                .sorted(Comparator.comparing(Order::getSubmittedDate).reversed())
+                .map(order -> new Order()
+                        .setId(order.getId())
+                        .setSubmittedDate(order.getSubmittedDate())
+                        .setStatus(order.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Result<Order> viewOrderDetails(Long orderId) {
+        return orderRepository.findById(orderId)
+                .map(Result::successful)
+                .orElseGet(() -> Result.error(Result.Code.ORDER_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public Result<Order> approveOrder(Long orderId) {
+        var orderResult = getOrderAwaitingApproval(orderId);
+        if (!orderResult.isSuccessful()) {
+            return Result.error(orderResult.getErrorCode());
+        }
+
+        var order = orderResult.getData();
+
+        order.setStatus(Order.OrderStatus.APPROVED);
+        return Result.successful(orderRepository.save(order));
+    }
+
+    @Override
+    @Transactional
+    public Result<Order> declineOrder(Long orderId, String reason) {
+        var orderResult = getOrderAwaitingApproval(orderId);
+        if (!orderResult.isSuccessful()) {
+            return Result.error(orderResult.getErrorCode());
+        }
+
+        var order = orderResult.getData();
+
+        order.setStatus(Order.OrderStatus.DECLINED);
+        order.setDeclineReason(reason);
+        return Result.successful(orderRepository.save(order));
+    }
+
+    @Override
+    public Result<Order> scheduleDelivery(Long orderId, Date deliveryDate, List<Truck> trucks) {
         return null;
     }
 
     @Override
-    public Result<Order> viewOrderDetails(int orderNumber) {
-        return null;
-    }
-
-    @Override
-    public Result<Order> approveOrder(int orderNumber) {
-        return null;
-    }
-
-    @Override
-    public Result<Order> declineOrder(int orderNumber, String reason) {
-        return null;
-    }
-
-    @Override
-    public Result<Order> scheduleDelivery(int orderNumber, Date deliveryDate, List<Truck> trucks) {
-        return null;
-    }
-
-    @Override
-    public Result<Order> markOrderAsFulfilled(int orderNumber) {
+    public Result<Order> markOrderAsFulfilled(Long orderId) {
         return null;
     }
 
@@ -187,9 +228,9 @@ public class OrderServiceImpl implements OrderService {
             Long itemId = existingItem.getId();
             if (itemId != null && !updatedItemIds.contains(itemId)) {
                 orderItemRepository.delete(existingItem);
-                return true; // Remove item from the list
+                return true;
             }
-            return false; // Keep item in the list
+            return false;
         });
     }
 
@@ -229,55 +270,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Result<Order> getUserOrder(User user, Long orderId) {
-        // Fetch the order by ID
         var existingOrderOpt = orderRepository.findById(orderId);
         if (existingOrderOpt.isEmpty()) {
             return Result.error(Result.Code.ORDER_NOT_FOUND);
         }
 
-        // Verify that the order belongs to the user
         var existingUserOrderOpt = orderRepository.findByIdAndUserId(orderId, user.getId());
         if (existingUserOrderOpt.isEmpty()) {
             return Result.error(Result.Code.USER_ORDER_NOT_FOUND);
         }
 
-        // Return the existing order
         var existingOrder = existingOrderOpt.get();
         return Result.successful(existingOrder);
     }
 
-    /*@Transactional
-    public Result<Order> updateOrder(Order updateOrderRequest) {
-        var orderOpt = orderRepository.findById(updateOrderRequest.getId());
+    private Result<Order> getOrderAwaitingApproval(Long orderId) {
+        var orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isEmpty()) {
             return Result.error(Result.Code.ORDER_NOT_FOUND);
         }
 
         var order = orderOpt.get();
-        if (!(Order.OrderStatus.CREATED.equals(order.getStatus())
-                || Order.OrderStatus.DECLINED.equals(order.getStatus()))) {
-            return Result.error(Result.Code.ORDER_CANNOT_BE_UPDATED);
+        if (Order.OrderStatus.AWAITING_APPROVAL != order.getStatus()) {
+            return Result.error(Result.Code.ORDER_IS_NOT_AWAITING_APPROVAL);
         }
 
-        updateOrderRequest.getItems().forEach(
-                orderItem -> orderItemRepository.findById(orderItem.getId())
-                        .map(updateOrderItemRequest -> {
-                            Optional.of(updateOrderItemRequest.getRequestedQuantity()).ifPresent(orderItem::setRequestedQuantity);
-                            return orderItemRepository.save(orderItem);
-                        })
-                        .orElseGet(() -> {
-                            var newOrderItem = new OrderItem()
-                                    .setInventoryItem(orderItem.getInventoryItem())
-                                    .setOrder(order)
-                                    .setRequestedQuantity(orderItem.getRequestedQuantity());
-
-                            return orderItemRepository.save(newOrderItem);
-                        }));
-
-        if (updateOrderRequest.getItems().isEmpty()) {
-            return Result.error(Result.Code.ORDER_ITEM_LIST_EMPTY);
-        }
-
-        return Result.successful(orderRepository.save(order));
-    }*/
+        return Result.successful(order);
+    }
 }

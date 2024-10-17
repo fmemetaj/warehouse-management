@@ -22,15 +22,15 @@ public interface OrderService {
 
     List<Order> viewOrdersByStatus(User user, String status);
 
-    List<Order> viewAllOrders();
+    List<Order> viewAllOrders(String status);
 
-    Result<Order> viewOrderDetails(int orderNumber);
+    Result<Order> viewOrderDetails(Long orderId);
 
-    Result<Order> approveOrder(int orderNumber);
+    Result<Order> approveOrder(Long orderId);
 
-    Result<Order> declineOrder(int orderNumber, String reason);
+    Result<Order> declineOrder(Long orderId, String reason);
 
-    Result<Order> scheduleDelivery(int orderNumber, Date deliveryDate, List<Truck> trucks);
+    Result<Order> scheduleDelivery(Long orderId, Date deliveryDate, List<Truck> trucks);
 
-    Result<Order> markOrderAsFulfilled(int orderNumber);
+    Result<Order> markOrderAsFulfilled(Long orderId);
 }

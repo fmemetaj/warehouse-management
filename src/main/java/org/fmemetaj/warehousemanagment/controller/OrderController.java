@@ -62,6 +62,35 @@ public class OrderController {
         return ResponseEntity.ok(orderService.viewOrdersByStatus(user, status));
     }
 
+    @GetMapping("all/{status}")
+    public ResponseEntity<List<Order>> getAllOrdersFiltered(
+            @PathVariable String status
+    ) {
+        return ResponseEntity.ok(orderService.viewAllOrders(status));
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<Result<Order>> viewOrderDetails(
+            @PathVariable Long id
+    ) {
+        return Result.response(orderService.viewOrderDetails(id));
+    }
+
+    @PutMapping("{id}/approve")
+    public ResponseEntity<Result<Order>> approveOrder(
+            @PathVariable Long id
+    ) {
+        return Result.response(orderService.approveOrder(id));
+    }
+
+    @PutMapping("{id}/decline")
+    public ResponseEntity<Result<Order>> declineOrder(
+            @PathVariable Long id,
+            @RequestBody DeclineReason declineReason
+    ) {
+        return Result.response(orderService.declineOrder(id, declineReason.reason));
+    }
+
 
     public record CreateOrderRequest(
             List<OrderItemRequest> orderItems
@@ -71,6 +100,11 @@ public class OrderController {
     public record OrderItemRequest(
             Long itemId,
             int requestedQuantity
+    ) {
+    }
+
+    public record DeclineReason(
+            String reason
     ) {
     }
 }

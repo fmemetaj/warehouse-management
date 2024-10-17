@@ -51,18 +51,28 @@ public record Result<T>(T result, Result.Code code) {
         ORDER_CANNOT_BE_UPDATED,
         ORDER_ITEM_NOT_FOUND,
         USER_ORDER_NOT_FOUND,
-        ROLE_NOT_FOUND,
-        INVALID_ROLE_NAME;
+        ORDER_IS_NOT_AWAITING_APPROVAL,
+        INVENTORY_ITEM_NOT_FOUND,
+        DELIVERY_CANNOT_BE_SCHEDULED_ON_SUNDAY,
+        ORDER_NOT_APPROVED,
+        TRUCKS_NOT_FOUND,
+        TRUCK_NOT_FOUND,
+        TRUCK_NOT_AVAILABLE,
+        EXCEEDS_TRUCK_CAPACITY,
+        INSUFFICIENT_INVENTORY,
+        DELIVERY_NOT_FOUND,
+        ORDER_CANNOT_BE_COMPLETED;
 
         public HttpStatus toHttpStatus() {
             return switch (this) {
-//                case "INVITATION_EXPIRED" -> HttpStatus.GONE;
-                case ORDER_CANNOT_BE_UPDATED -> HttpStatus.UNAUTHORIZED;
+                case TRUCK_NOT_AVAILABLE -> HttpStatus.GONE;
+                case ORDER_IS_NOT_AWAITING_APPROVAL, ORDER_NOT_APPROVED -> HttpStatus.UNAUTHORIZED;
 //                case "INVITATION_REVOKED" -> HttpStatus.LOCKED;
-//                case "MEMBER_ALREADY_EXISTS, MEMBER_ALREADY_INVITED, INVITE_ALREADY_ACCEPTED"
-//                        -> HttpStatus.CONFLICT;
-                case ORDER_ITEM_LIST_EMPTY, ORDER_NOT_FOUND, ORDER_ITEM_NOT_FOUND, USER_ORDER_NOT_FOUND ->
-                        HttpStatus.NOT_FOUND;
+                case DELIVERY_CANNOT_BE_SCHEDULED_ON_SUNDAY, EXCEEDS_TRUCK_CAPACITY,
+                     INSUFFICIENT_INVENTORY, ORDER_CANNOT_BE_COMPLETED -> HttpStatus.CONFLICT;
+                case ORDER_ITEM_LIST_EMPTY, ORDER_NOT_FOUND, ORDER_ITEM_NOT_FOUND,
+                     USER_ORDER_NOT_FOUND, INVENTORY_ITEM_NOT_FOUND, TRUCKS_NOT_FOUND,
+                     TRUCK_NOT_FOUND, DELIVERY_NOT_FOUND-> HttpStatus.NOT_FOUND;
                 default -> HttpStatus.INTERNAL_SERVER_ERROR;
             };
         }

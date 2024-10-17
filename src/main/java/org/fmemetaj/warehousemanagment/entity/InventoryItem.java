@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
+@Accessors(chain = true)
 @Entity
 @Table(name = "inventory_items")
 public class InventoryItem {
