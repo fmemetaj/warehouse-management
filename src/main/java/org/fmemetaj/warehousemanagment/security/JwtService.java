@@ -6,7 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.apache.commons.lang3.StringUtils;
 import org.fmemetaj.warehousemanagment.entity.User;
-import org.fmemetaj.warehousemanagment.service.UserService;
+import org.fmemetaj.warehousemanagment.service.UserServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.security.KeyPair;
@@ -18,12 +18,12 @@ import java.util.Optional;
 @Service
 public class JwtService {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
     private final KeyPair keyPair;
     private final JwtParser jwtParser;
 
-    public JwtService(UserService userService) {
-        this.userService = userService;
+    public JwtService(UserServiceImpl userServiceImpl) {
+        this.userServiceImpl = userServiceImpl;
         this.keyPair = Keys.keyPairFor(SignatureAlgorithm.ES256);
         this.jwtParser = Jwts.parserBuilder()
                 .setSigningKey(keyPair.getPublic())
@@ -49,6 +49,6 @@ public class JwtService {
                 .getSubject();
 
         return Optional.ofNullable(username)
-                .flatMap(userService::findByUsername);
+                .flatMap(userServiceImpl::findByUsername);
     }
 }

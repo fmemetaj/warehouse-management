@@ -4,9 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.fmemetaj.warehousemanagment.entity.RegistrationForm;
 import org.fmemetaj.warehousemanagment.security.JwtService;
 import org.fmemetaj.warehousemanagment.security.Token;
-import org.fmemetaj.warehousemanagment.service.UserService;
+import org.fmemetaj.warehousemanagment.service.UserServiceImpl;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,14 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/signup")
 public class RegistrationController {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
     private final JwtService jwtService;
-    private final PasswordEncoder passwordEncoder;
 
-    public RegistrationController(UserService userService, JwtService jwtService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
+    public RegistrationController(UserServiceImpl userServiceImpl, JwtService jwtService) {
+        this.userServiceImpl = userServiceImpl;
         this.jwtService = jwtService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping
@@ -33,7 +30,7 @@ public class RegistrationController {
     public ResponseEntity<Token> signUp(@RequestBody RegistrationForm registrationForm) {
         log.info("Received registration form: {}", registrationForm);
 
-        var user = userService.createUser(registrationForm, passwordEncoder);
+        var user = userServiceImpl.createUser(registrationForm);
 
         var jwtToken = jwtService.createJwtToken(user);
 

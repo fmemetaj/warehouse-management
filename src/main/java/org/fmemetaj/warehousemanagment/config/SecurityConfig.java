@@ -3,7 +3,7 @@ package org.fmemetaj.warehousemanagment.config;
 import lombok.extern.slf4j.Slf4j;
 import org.fmemetaj.warehousemanagment.security.JwtFilter;
 import org.fmemetaj.warehousemanagment.security.WarehouseAuthenticationManager;
-import org.fmemetaj.warehousemanagment.service.UserService;
+import org.fmemetaj.warehousemanagment.service.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,7 +30,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            UserService userService,
+            UserServiceImpl userServiceImpl,
             PasswordEncoder passwordEncoder
     ) throws Exception {
 
@@ -47,17 +47,17 @@ public class SecurityConfig {
         ).permitAll());
 
         http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .authenticationManager(new WarehouseAuthenticationManager(userService, passwordEncoder))
+                .authenticationManager(new WarehouseAuthenticationManager(userServiceImpl, passwordEncoder))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(
-            UserService userService,
+            UserServiceImpl userServiceImpl,
             PasswordEncoder passwordEncoder
     ) {
-        return new WarehouseAuthenticationManager(userService, passwordEncoder);
+        return new WarehouseAuthenticationManager(userServiceImpl, passwordEncoder);
     }
 
     @Bean

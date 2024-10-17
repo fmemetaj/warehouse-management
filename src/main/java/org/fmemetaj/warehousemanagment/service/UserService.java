@@ -1,45 +1,22 @@
 package org.fmemetaj.warehousemanagment.service;
 
-import org.apache.commons.lang3.StringUtils;
 import org.fmemetaj.warehousemanagment.entity.RegistrationForm;
+import org.fmemetaj.warehousemanagment.entity.Result;
 import org.fmemetaj.warehousemanagment.entity.User;
-import org.fmemetaj.warehousemanagment.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@Service
-public class UserService {
+public interface UserService {
 
-    private final UserRepository userRepository;
+    Optional<User> findByUsername(String username);
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    User createUser(RegistrationForm registrationForm);
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsernameIgnoreCase(username);
-    }
+    Result<User> updateUser(User user);
 
-    @Transactional
-    public User createUser(RegistrationForm registrationForm, PasswordEncoder passwordEncoder) {
-        var existingUser = userRepository.findByUsernameIgnoreCase(registrationForm.getUsername());
-        if (existingUser.isPresent()) {
-            throw new IllegalStateException("Already registered");
-        }
+    void deleteUser(String username);
 
-        if (StringUtils.isAnyBlank(registrationForm.getUsername(), registrationForm.getPassword())) {
-            throw new IllegalStateException("Username and Password fields are required");
-        }
+    Result<User> findUserByUsername(String username);
 
-        var user = new User()
-                .setUsername(registrationForm.getUsername())
-                .setPassword(passwordEncoder.encode(registrationForm.getPassword()))
-                .setRole(registrationForm.getRole());
-
-        return userRepository.save(user);
-    }
-
+    void requestNewPassword(String username);
 }

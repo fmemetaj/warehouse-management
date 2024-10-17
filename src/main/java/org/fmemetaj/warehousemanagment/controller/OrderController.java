@@ -1,6 +1,5 @@
 package org.fmemetaj.warehousemanagment.controller;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.fmemetaj.warehousemanagment.entity.Order;
 import org.fmemetaj.warehousemanagment.entity.Result;
@@ -19,7 +18,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    public OrderController(final OrderService orderService) {
+    public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
@@ -28,49 +27,50 @@ public class OrderController {
             @AuthenticationPrincipal User user,
             @RequestBody CreateOrderRequest createOrderRequest
     ) {
-        return response(orderService.createOrder(user, createOrderRequest.orderItems));
+        return Result.response(orderService.createOrder(user, createOrderRequest.orderItems));
     }
 
     @PutMapping("update")
     public ResponseEntity<Result<Order>> updateOrder(
             @AuthenticationPrincipal User user,
-            @RequestBody UpdateOrderRequest updateOrderRequest
+            @RequestBody Order updateOrderRequest
     ) {
-        return response(orderService.updateOrder(user, updateOrderRequest.orderItems));
+        return Result.response(orderService.updateOrder(user, updateOrderRequest.getId(), updateOrderRequest));
     }
 
-    @GetMapping
-    public List<Order> getAllOrders() {
-        return orderService.getAllOrders();
+    @DeleteMapping("{id}/delete")
+    public ResponseEntity<Result<Order>> deleteOrder(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id
+    ) {
+        return Result.response(orderService.cancelOrder(user, id));
     }
 
-    @PutMapping("{orderId}/status")
-    public Order updateOrderStatus(@PathVariable Long orderId, @RequestParam Order.OrderStatus status) {
-        return orderService.updateOrderStatus(orderId, status);
+    @PostMapping("{id}/submit")
+    public ResponseEntity<Result<Order>> submitOrder(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id
+    ) {
+        return Result.response(orderService.submitOrder(user, id));
     }
 
-    private <T> ResponseEntity<Result<T>> response(Result<T> result) {
-        if (result.code() != Result.Code.SUCCESS) {
-            var httpStatus = result.code().toHttpStatus();
-            log.info("Error: {}", result.code());
-
-            return ResponseEntity.status(httpStatus).body(result);
-        }
-
-        return ResponseEntity.ok(result);
+    @GetMapping("get/{status}")
+    public ResponseEntity<List<Order>> getOrdersByStatus(
+            @AuthenticationPrincipal User user,
+            @PathVariable String status
+    ) {
+        return ResponseEntity.ok(orderService.viewOrdersByStatus(user, status));
     }
+
 
     public record CreateOrderRequest(
             List<OrderItemRequest> orderItems
-    ) {}
-
-    public record UpdateOrderRequest(
-            @NonNull Long orderId,
-            List<OrderItemRequest> orderItems
-    ) {}
+    ) {
+    }
 
     public record OrderItemRequest(
             Long itemId,
             int requestedQuantity
-    ) {}
+    ) {
+    }
 }

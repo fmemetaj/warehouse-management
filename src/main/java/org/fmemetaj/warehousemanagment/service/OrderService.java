@@ -1,93 +1,36 @@
 package org.fmemetaj.warehousemanagment.service;
 
+import lombok.NonNull;
 import org.fmemetaj.warehousemanagment.controller.OrderController;
 import org.fmemetaj.warehousemanagment.entity.Order;
-import org.fmemetaj.warehousemanagment.entity.OrderItem;
 import org.fmemetaj.warehousemanagment.entity.Result;
+import org.fmemetaj.warehousemanagment.entity.Truck;
 import org.fmemetaj.warehousemanagment.entity.User;
-import org.fmemetaj.warehousemanagment.repository.InventoryRepository;
-import org.fmemetaj.warehousemanagment.repository.OrderItemRepository;
-import org.fmemetaj.warehousemanagment.repository.OrderRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-@Service
-public class OrderService {
+public interface OrderService {
 
-    private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
-    private final InventoryRepository inventoryRepository;
+    Result<Order> createOrder(User user, List<OrderController.OrderItemRequest> requestOrderItems);
 
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, InventoryRepository inventoryRepository) {
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
-        this.inventoryRepository = inventoryRepository;
-    }
+    Result<Order> updateOrder(User user, @NonNull Long orderId, Order updateOrderRequest);
 
-    @Transactional
-    public Result<Order> createOrder(User user, List<OrderController.OrderItemRequest> requestOrderItems) {
-        var order = new Order().setUser(user);
+    Result<Order> cancelOrder(User user, Long orderId);
 
-        List<OrderItem> orderItemList = new ArrayList<>();
-        requestOrderItems.forEach(
-                orderItem -> inventoryRepository.findById(orderItem.itemId())
-                        .map(item -> {
-                            var newOrderItem = new OrderItem()
-                                    .setInventoryItem(item)
-                                    .setOrder(order)
-                                    .setRequestedQuantity(orderItem.requestedQuantity());
+    Result<Order> submitOrder(User user, Long orderId);
 
-                            var savedOrderItem = orderItemRepository.save(newOrderItem);
-                            orderItemList.add(savedOrderItem);
-                            return savedOrderItem;
-                        }));
+    List<Order> viewOrdersByStatus(User user, String status);
 
-        if (orderItemList.isEmpty()) {
-            return Result.error(Result.Code.ORDER_ITEM_LIST_EMPTY);
-        }
+    List<Order> viewAllOrders();
 
-        order.setItems(orderItemList);
+    Result<Order> viewOrderDetails(int orderNumber);
 
-        return Result.successful(orderRepository.save(order));
-    }
+    Result<Order> approveOrder(int orderNumber);
 
-    @Transactional
-    public Result<Order> updateOrder(User user, List<OrderController.OrderItemRequest> requestOrderItems) {
-        var order = new Order().setUser(user);
+    Result<Order> declineOrder(int orderNumber, String reason);
 
-        List<OrderItem> orderItemList = new ArrayList<>();
-        requestOrderItems.forEach(
-                orderItem -> inventoryRepository.findById(orderItem.itemId())
-                        .map(item -> {
-                            var newOrderItem = new OrderItem()
-                                    .setInventoryItem(item)
-                                    .setOrder(order)
-                                    .setRequestedQuantity(orderItem.requestedQuantity());
+    Result<Order> scheduleDelivery(int orderNumber, Date deliveryDate, List<Truck> trucks);
 
-                            var savedOrderItem = orderItemRepository.save(newOrderItem);
-                            orderItemList.add(savedOrderItem);
-                            return savedOrderItem;
-                        }));
-
-        if (orderItemList.isEmpty()) {
-            return Result.error(Result.Code.ORDER_ITEM_LIST_EMPTY);
-        }
-
-        order.setItems(orderItemList);
-
-        return Result.successful(orderRepository.save(order));
-    }
-
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
-    }
-
-    public Order updateOrderStatus(Long orderId, Order.OrderStatus status) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        order.setStatus(status);
-        return orderRepository.save(order);
-    }
+    Result<Order> markOrderAsFulfilled(int orderNumber);
 }
