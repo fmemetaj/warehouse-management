@@ -68,7 +68,6 @@ public record Result<T>(T result, Result.Code code) {
             return switch (this) {
                 case TRUCK_NOT_AVAILABLE -> HttpStatus.GONE;
                 case ORDER_IS_NOT_AWAITING_APPROVAL, ORDER_NOT_APPROVED -> HttpStatus.UNAUTHORIZED;
-//                case "INVITATION_REVOKED" -> HttpStatus.LOCKED;
                 case DELIVERY_CANNOT_BE_SCHEDULED_ON_SUNDAY, EXCEEDS_TRUCK_CAPACITY,
                      INSUFFICIENT_INVENTORY, ORDER_CANNOT_BE_COMPLETED -> HttpStatus.CONFLICT;
                 case ORDER_ITEM_LIST_EMPTY, ORDER_NOT_FOUND, ORDER_ITEM_NOT_FOUND,
