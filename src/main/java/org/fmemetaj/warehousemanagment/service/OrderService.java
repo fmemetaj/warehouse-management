@@ -4,10 +4,8 @@ import lombok.NonNull;
 import org.fmemetaj.warehousemanagment.controller.OrderController;
 import org.fmemetaj.warehousemanagment.entity.Order;
 import org.fmemetaj.warehousemanagment.entity.Result;
-import org.fmemetaj.warehousemanagment.entity.Truck;
 import org.fmemetaj.warehousemanagment.entity.User;
 
-import java.util.Date;
 import java.util.List;
 
 public interface OrderService {
@@ -30,7 +28,4 @@ public interface OrderService {
 
     Result<Order> declineOrder(Long orderId, String reason);
 
-    Result<Order> scheduleDelivery(Long orderId, Date deliveryDate, List<Truck> trucks);
-
-    Result<Order> markOrderAsFulfilled(Long orderId);
 }

@@ -5,6 +5,7 @@ import org.fmemetaj.warehousemanagment.entity.Truck;
 import org.fmemetaj.warehousemanagment.service.TruckService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +20,13 @@ public class TruckController {
         this.truckService = truckService;
     }
 
+    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
     @GetMapping
     public List<Truck> getAllTrucks() {
         return truckService.getAllTrucks();
     }
 
+    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
     @GetMapping("{chassis}")
     public ResponseEntity<Result<Truck>> getTruckByChassis(
             @PathVariable String chassis
@@ -31,6 +34,7 @@ public class TruckController {
         return Result.response(truckService.getTruck(chassis));
     }
 
+    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
     @PostMapping("add")
     public ResponseEntity<Result<Truck>> addTruck(
             @RequestBody Truck truck
@@ -38,6 +42,7 @@ public class TruckController {
         return Result.response(truckService.addTruck(truck));
     }
 
+    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
     @PutMapping("update")
     public ResponseEntity<Result<Truck>> updateTruck(
             @RequestBody Truck truck
@@ -45,6 +50,7 @@ public class TruckController {
         return Result.response(truckService.updateTruck(truck));
     }
 
+    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
     @DeleteMapping("{chassis}/delete")
     public ResponseEntity<?> deleteTruck(
             @PathVariable String chassis

@@ -2,7 +2,10 @@ package org.fmemetaj.warehousemanagment.service;
 
 import lombok.NonNull;
 import org.fmemetaj.warehousemanagment.controller.OrderController;
-import org.fmemetaj.warehousemanagment.entity.*;
+import org.fmemetaj.warehousemanagment.entity.Order;
+import org.fmemetaj.warehousemanagment.entity.OrderItem;
+import org.fmemetaj.warehousemanagment.entity.Result;
+import org.fmemetaj.warehousemanagment.entity.User;
 import org.fmemetaj.warehousemanagment.repository.InventoryRepository;
 import org.fmemetaj.warehousemanagment.repository.OrderItemRepository;
 import org.fmemetaj.warehousemanagment.repository.OrderRepository;
@@ -196,16 +199,6 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(Order.OrderStatus.DECLINED);
         order.setDeclineReason(reason);
         return Result.successful(orderRepository.save(order));
-    }
-
-    @Override
-    public Result<Order> scheduleDelivery(Long orderId, Date deliveryDate, List<Truck> trucks) {
-        return null;
-    }
-
-    @Override
-    public Result<Order> markOrderAsFulfilled(Long orderId) {
-        return null;
     }
 
     private Result<Result.Code> updateOrderItems(Order existingOrder, List<OrderItem> updatedItems) {

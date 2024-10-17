@@ -26,7 +26,7 @@ public class PasswordResetController {
     }
 
 
-    @PostMapping("/current-user")
+    @PostMapping("current-user")
     public ResponseEntity<ResetPasswordResponse> resetPasswordFromCurrentUser(
             @AuthenticationPrincipal User user,
             @RequestBody UpdatePasswordRequest updatePasswordRequest
@@ -37,7 +37,7 @@ public class PasswordResetController {
                 : ResponseEntity.badRequest().body(resetPasswordResponse);
     }
 
-    @PostMapping("/forgot-password")
+    @PostMapping("forgot-password")
     public ResponseEntity<ResetPasswordResponse> resetPassword(
             @RequestBody ForgotPasswordRequest forgotPasswordRequest
     ) {

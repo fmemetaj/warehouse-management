@@ -6,6 +6,7 @@ import org.fmemetaj.warehousemanagment.entity.Result;
 import org.fmemetaj.warehousemanagment.entity.User;
 import org.fmemetaj.warehousemanagment.service.OrderService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("create")
     public ResponseEntity<Result<Order>> createOrder(
             @AuthenticationPrincipal User user,
@@ -30,6 +32,7 @@ public class OrderController {
         return Result.response(orderService.createOrder(user, createOrderRequest.orderItems));
     }
 
+    @PreAuthorize("hasRole('CLIENT')")
     @PutMapping("update")
     public ResponseEntity<Result<Order>> updateOrder(
             @AuthenticationPrincipal User user,
@@ -38,6 +41,7 @@ public class OrderController {
         return Result.response(orderService.updateOrder(user, updateOrderRequest.getId(), updateOrderRequest));
     }
 
+    @PreAuthorize("hasRole('CLIENT')")
     @DeleteMapping("{id}/delete")
     public ResponseEntity<Result<Order>> deleteOrder(
             @AuthenticationPrincipal User user,
@@ -46,6 +50,7 @@ public class OrderController {
         return Result.response(orderService.cancelOrder(user, id));
     }
 
+    @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("{id}/submit")
     public ResponseEntity<Result<Order>> submitOrder(
             @AuthenticationPrincipal User user,
@@ -54,6 +59,7 @@ public class OrderController {
         return Result.response(orderService.submitOrder(user, id));
     }
 
+    @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("get/{status}")
     public ResponseEntity<List<Order>> getOrdersByStatus(
             @AuthenticationPrincipal User user,
@@ -62,6 +68,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.viewOrdersByStatus(user, status));
     }
 
+    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
     @GetMapping("all/{status}")
     public ResponseEntity<List<Order>> getAllOrdersFiltered(
             @PathVariable String status
@@ -69,6 +76,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.viewAllOrders(status));
     }
 
+    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
     @GetMapping("{id}")
     public ResponseEntity<Result<Order>> viewOrderDetails(
             @PathVariable Long id
@@ -76,6 +84,7 @@ public class OrderController {
         return Result.response(orderService.viewOrderDetails(id));
     }
 
+    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
     @PutMapping("{id}/approve")
     public ResponseEntity<Result<Order>> approveOrder(
             @PathVariable Long id
@@ -83,6 +92,7 @@ public class OrderController {
         return Result.response(orderService.approveOrder(id));
     }
 
+    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
     @PutMapping("{id}/decline")
     public ResponseEntity<Result<Order>> declineOrder(
             @PathVariable Long id,
