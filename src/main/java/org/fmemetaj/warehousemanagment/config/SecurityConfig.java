@@ -47,7 +47,12 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
                 "/signup",
-                "/password-reset/forgot-password"
+                "/password-reset/forgot-password",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/webjars/**",
+                "/swagger-ui.html"
         ).permitAll());
 
         http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())

@@ -38,6 +38,16 @@ public class JwtFilter extends OncePerRequestFilter {
             throw new ServletException("Bad Request State");
         }
 
+        var path = request.getRequestURI().substring(request.getContextPath().length());
+
+        if (path.startsWith("/swagger-ui/") || path.equals("/swagger-ui.html") ||
+                path.startsWith("/v3/api-docs") || path.startsWith("/swagger-resources") ||
+                path.startsWith("/webjars/")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Get authorization header and validate
         final var header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.isBlank(header) || !StringUtils.startsWithIgnoreCase(header, "bearer ")) {
