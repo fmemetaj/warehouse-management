@@ -1,5 +1,6 @@
 package org.fmemetaj.warehousemanagment.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,6 +36,7 @@ public class Delivery {
     private DeliveryStatus status = DeliveryStatus.SCHEDULED;
 
     @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<DeliveryTruck> deliveryTrucks;
 
     public enum DeliveryStatus {

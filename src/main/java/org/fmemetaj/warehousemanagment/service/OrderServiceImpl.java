@@ -77,12 +77,12 @@ public class OrderServiceImpl implements OrderService {
             return Result.error(Result.Code.ORDER_CANNOT_BE_UPDATED);
         }
 
-        if (updateOrderRequest.getItems() == null || updateOrderRequest.getItems().isEmpty()) {
+        if (updateOrderRequest.getOrderItems() == null || updateOrderRequest.getOrderItems().isEmpty()) {
             return Result.error(Result.Code.ORDER_ITEM_LIST_EMPTY);
         }
 
         // Update the order items
-        var updateResult = updateOrderItems(existingOrder, updateOrderRequest.getItems());
+        var updateResult = updateOrderItems(existingOrder, updateOrderRequest.getOrderItems());
 
         if (!updateResult.isSuccessful()) {
             return Result.error(updateResult.getErrorCode());
@@ -158,10 +158,6 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findAll().stream()
                 .filter(order -> order.getStatus() == orderStatus)
                 .sorted(Comparator.comparing(Order::getSubmittedDate).reversed())
-                .map(order -> new Order()
-                        .setId(order.getId())
-                        .setSubmittedDate(order.getSubmittedDate())
-                        .setStatus(order.getStatus()))
                 .collect(Collectors.toList());
     }
 
@@ -217,7 +213,7 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toSet());
 
         // Remove items from existing order that are not in updated items
-        existingOrder.getItems().removeIf(existingItem -> {
+        existingOrder.getOrderItems().removeIf(existingItem -> {
             Long itemId = existingItem.getId();
             if (itemId != null && !updatedItemIds.contains(itemId)) {
                 orderItemRepository.delete(existingItem);
@@ -238,7 +234,7 @@ public class OrderServiceImpl implements OrderService {
                 }
 
                 var existingItem = existingItemOpt.get();
-                Optional.of(updatedItem.getRequestedQuantity()).ifPresent(existingItem::setRequestedQuantity);
+                Optional.ofNullable(updatedItem.getRequestedQuantity()).ifPresent(existingItem::setRequestedQuantity);
                 orderItemRepository.save(existingItem);
             } else {
                 // Add new item
@@ -246,7 +242,7 @@ public class OrderServiceImpl implements OrderService {
                         .setInventoryItem(updatedItem.getInventoryItem())
                         .setOrder(existingOrder)
                         .setRequestedQuantity(updatedItem.getRequestedQuantity());
-                existingOrder.getItems().add(newOrderItem);
+                existingOrder.getOrderItems().add(newOrderItem);
                 orderItemRepository.save(newOrderItem);
             }
         }
@@ -254,9 +250,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Optional<OrderItem> findOrderItemById(Order order, Long itemId) {
-        for (OrderItem item : order.getItems()) {
+        for (OrderItem item : order.getOrderItems()) {
             if (itemId.equals(item.getId())) {
-                return Optional.of(item);
+                return Optional.ofNullable(item);
             }
         }
         return Optional.empty();

@@ -50,7 +50,7 @@ public class UserController {
             @PathVariable String username
     ) {
         return userService.deleteUser(username)
-                ? ResponseEntity.ok().build()
+                ? ResponseEntity.ok("User removed successfully")
                 : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User could not be deleted");
     }
 }

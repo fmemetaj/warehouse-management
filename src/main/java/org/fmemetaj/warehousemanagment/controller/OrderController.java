@@ -51,7 +51,7 @@ public class OrderController {
     }
 
     @PreAuthorize("hasRole('CLIENT')")
-    @PostMapping("{id}/submit")
+    @PutMapping("{id}/submit")
     public ResponseEntity<Result<Order>> submitOrder(
             @AuthenticationPrincipal User user,
             @PathVariable Long id
@@ -68,7 +68,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.viewOrdersByStatus(user, status));
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
     @GetMapping("all/{status}")
     public ResponseEntity<List<Order>> getAllOrdersFiltered(
             @PathVariable String status
@@ -76,7 +76,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.viewAllOrders(status));
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
     @GetMapping("{id}")
     public ResponseEntity<Result<Order>> viewOrderDetails(
             @PathVariable Long id
@@ -84,7 +84,7 @@ public class OrderController {
         return Result.response(orderService.viewOrderDetails(id));
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
     @PutMapping("{id}/approve")
     public ResponseEntity<Result<Order>> approveOrder(
             @PathVariable Long id
@@ -92,7 +92,7 @@ public class OrderController {
         return Result.response(orderService.approveOrder(id));
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
     @PutMapping("{id}/decline")
     public ResponseEntity<Result<Order>> declineOrder(
             @PathVariable Long id,

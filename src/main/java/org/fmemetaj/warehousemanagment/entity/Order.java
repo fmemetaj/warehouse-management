@@ -1,7 +1,8 @@
 package org.fmemetaj.warehousemanagment.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonIgnore
     private User user;
 
     @Temporal(TemporalType.DATE)
@@ -41,16 +42,15 @@ public class Order {
     private Date deadlineDate;
 
     @OneToMany(mappedBy = "order", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JsonManagedReference
     @OrderBy("id ASC")
-    private List<OrderItem> items;
+    private List<OrderItem> orderItems;
 
-    public Order(User user, List<OrderItem> items) {
+    public Order(User user, List<OrderItem> orderItems) {
         this.user = user;
         this.submittedDate = new Date();
         this.status = OrderStatus.CREATED;
         setDeadlineDate();
-        this.items = items;
+        this.orderItems = orderItems;
     }
 
     private void setDeadlineDate() {
@@ -59,6 +59,11 @@ public class Order {
 
         calendar.add(Calendar.MONTH, 1);
         this.deadlineDate = calendar.getTime();
+    }
+
+    @JsonProperty("username")
+    public String getUsername() {
+        return (user != null) ? user.getUsername() : null;
     }
 
     public enum OrderStatus {

@@ -20,13 +20,13 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
     @GetMapping
     public List<InventoryItem> getInventory() {
         return inventoryService.getInventory();
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
     @GetMapping("{id}")
     public ResponseEntity<Result<InventoryItem>> getInventoryItem(
             @PathVariable Long id
@@ -34,7 +34,7 @@ public class InventoryController {
         return Result.response(inventoryService.getItem(id));
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
     @PostMapping("add")
     public ResponseEntity<Result<InventoryItem>> addInventoryItem(
             @RequestBody InventoryItem inventoryItem
@@ -42,7 +42,7 @@ public class InventoryController {
         return Result.response(inventoryService.addItem(inventoryItem));
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
     @PutMapping("update")
     public ResponseEntity<Result<InventoryItem>> updateInventoryItem(
             @RequestBody InventoryItem inventoryItem
@@ -50,13 +50,13 @@ public class InventoryController {
         return Result.response(inventoryService.updateItem(inventoryItem));
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
     @DeleteMapping("{id}/delete")
     public ResponseEntity<?> deleteInventoryItem(
             @PathVariable Long id
     ) {
         return inventoryService.deleteItem(id)
-                ? ResponseEntity.ok().build()
+                ? ResponseEntity.ok("Inventory Item deleted successfully")
                 : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory Item could not be deleted");
     }
 }

@@ -68,9 +68,9 @@ public class UserServiceImpl implements UserService {
         }
 
         var foundUser = foundUserOpt.get();
-        Optional.of(user.getUsername()).ifPresent(foundUser::setUsername);
-        Optional.of(user.getPassword()).ifPresent(password -> foundUser.setPassword(passwordEncoder.encode(password)));
-        Optional.of(user.getRole()).ifPresent(foundUser::setRole);
+        Optional.ofNullable(user.getUsername()).ifPresent(foundUser::setUsername);
+        Optional.ofNullable(user.getPassword()).ifPresent(password -> foundUser.setPassword(passwordEncoder.encode(password)));
+        Optional.ofNullable(user.getRole()).ifPresent(foundUser::setRole);
 
         return Result.successful(userRepository.save(foundUser));
     }

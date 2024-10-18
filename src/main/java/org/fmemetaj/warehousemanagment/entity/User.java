@@ -29,37 +29,43 @@ public class User implements Authentication {
     private String username;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonIgnore
     @OrderBy("id ASC")
     private List<Order> orders;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.springRole()));
     }
 
     @Override
+    @JsonIgnore
     public Object getCredentials() {
         return password;
     }
 
     @Override
+    @JsonIgnore
     public Object getDetails() {
         return username;
     }
 
     @Override
+    @JsonIgnore
     public Object getPrincipal() {
         return this;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAuthenticated() {
         return true;
     }
@@ -71,6 +77,7 @@ public class User implements Authentication {
     }
 
     @Override
+    @JsonIgnore
     public String getName() {
         return username;
     }

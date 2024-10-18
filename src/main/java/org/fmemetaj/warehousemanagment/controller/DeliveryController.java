@@ -20,7 +20,7 @@ public class DeliveryController {
         this.deliveryService = deliveryService;
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
     @PostMapping("/schedule")
     public ResponseEntity<Result<Delivery>> scheduleDelivery(@RequestBody ScheduleDeliveryRequest request) {
         return Result.response(deliveryService.scheduleDelivery(
@@ -30,8 +30,8 @@ public class DeliveryController {
         ));
     }
 
-    @PreAuthorize("hasRole('WAREHOUSE_ MANAGER')")
-    @PostMapping("/complete/{deliveryId}")
+    @PreAuthorize("hasRole('WAREHOUSE_MANAGER')")
+    @PostMapping("{deliveryId}/complete")
     public ResponseEntity<?> completeDelivery(
             @PathVariable Long deliveryId
     ) {

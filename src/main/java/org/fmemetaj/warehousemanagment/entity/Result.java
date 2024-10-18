@@ -1,5 +1,6 @@
 package org.fmemetaj.warehousemanagment.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,18 +29,22 @@ public record Result<T>(T result, Result.Code code) {
         return ResponseEntity.ok(result);
     }
 
+    @JsonIgnore
     public boolean isSuccessful() {
         return code == Result.Code.SUCCESS;
     }
 
+    @JsonIgnore
     public boolean isFailure() {
         return !isSuccessful();
     }
 
+    @JsonIgnore
     public T getData() {
         return result;
     }
 
+    @JsonIgnore
     public Result.Code getErrorCode() {
         return code;
     }

@@ -53,8 +53,8 @@ public class InventoryServiceImpl implements InventoryService {
 
         var foundItem = foundItemOpt.get();
         Optional.ofNullable(item.getName()).ifPresent(foundItem::setName);
-        Optional.of(item.getQuantity()).ifPresent(foundItem::setQuantity);
-        Optional.of(item.getUnitPrice()).ifPresent(foundItem::setUnitPrice);
+        Optional.ofNullable(item.getQuantity()).ifPresent(foundItem::setQuantity);
+        Optional.ofNullable(item.getUnitPrice()).ifPresent(foundItem::setUnitPrice);
 
         return Result.successful(inventoryRepository.save(foundItem));
     }

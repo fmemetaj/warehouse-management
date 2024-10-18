@@ -64,13 +64,13 @@ public class DeliveryServiceImpl implements DeliveryService {
             }
         }
 
-        int totalItems = order.getItems().stream().mapToInt(OrderItem::getRequestedQuantity).sum();
+        int totalItems = order.getOrderItems().stream().mapToInt(OrderItem::getRequestedQuantity).sum();
         int maxTruckCapacity = trucks.size() * 10;
         if (totalItems > maxTruckCapacity) {
             return Result.error(Result.Code.EXCEEDS_TRUCK_CAPACITY);
         }
 
-        for (var orderItem : order.getItems()) {
+        for (var orderItem : order.getOrderItems()) {
             var inventoryItem = orderItem.getInventoryItem();
             int availableQuantity = inventoryItem.getQuantity();
             int requestedQuantity = orderItem.getRequestedQuantity();

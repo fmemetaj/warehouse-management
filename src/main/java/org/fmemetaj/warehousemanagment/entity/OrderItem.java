@@ -1,6 +1,8 @@
 package org.fmemetaj.warehousemanagment.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,13 +23,17 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "inventory_item_id")
-    @JsonBackReference
     private InventoryItem inventoryItem;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
-    @JsonBackReference
+    @JsonIgnore
     private Order order;
 
     private int requestedQuantity;
+
+    @JsonProperty("orderId")
+    public Long getOrderId() {
+        return (order != null) ? order.getId() : null;
+    }
 }
